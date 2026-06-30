@@ -1,6 +1,6 @@
 # Foundation Model Benchmark
 
-Zero-shot time series foundation models benchmarked against tuned statistical and ML baselines on real CPG and retail demand data.
+Zero-shot time series foundation models benchmarked against basic statistical and ML baselines on real CPG and retail demand data.
 
 ## Models
 
