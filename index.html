@@ -196,39 +196,62 @@
     'TIMESFM25_SL1','LGBM_BASE_RECURSIVE','SES_OPT','TIMESFM25_SL2'
   ];
   const CROSS = {
-    'TIMESFM25_SL2':       { composite: 4.00 },
-    'SES_OPT':             { composite: 4.00 },
-    'LGBM_BASE_RECURSIVE': { composite: 4.00 },
-    'TIMESFM25_SL1':       { composite: 4.67 },
-    'SEASONAL_NAIVE':      { composite: 5.00 },
-    'CHRONOS2_SL2':        { composite: 5.33 },
-    'MOIRAI2_SMALL':       { composite: 6.00 },
-    'LGBM_BASE_DIRECT':    { composite: 6.00 },
-    'MOIRAI_MOE_BASE':     { composite: 6.33 },
-    'MOIRAI_MOE_SMALL':    { composite: 9.67 },
+    'TIMESFM25_SL2':       { composite: 4.00, wmape: 3.00, mase: 1.67 },
+    'SES_OPT':             { composite: 4.00, wmape: 6.00, mase: 6.00 },
+    'LGBM_BASE_RECURSIVE': { composite: 4.00, wmape: 6.33, mase: 6.00 },
+    'TIMESFM25_SL1':       { composite: 4.67, wmape: 3.67, mase: 3.33 },
+    'SEASONAL_NAIVE':      { composite: 5.00, wmape: 6.33, mase: 9.00 },
+    'CHRONOS2_SL2':        { composite: 5.33, wmape: 4.00, mase: 2.33 },
+    'MOIRAI2_SMALL':       { composite: 6.00, wmape: 2.33, mase: 3.33 },
+    'LGBM_BASE_DIRECT':    { composite: 6.00, wmape: 6.00, mase: 5.33 },
+    'MOIRAI_MOE_BASE':     { composite: 6.33, wmape: 8.00, mase: 9.67 },
+    'MOIRAI_MOE_SMALL':    { composite: 9.67, wmape: 9.33, mase: 8.33 },
   };
 
-  Plotly.newPlot('chart-overview', [{
+  // Small multiples — one panel per metric, shared model order + shared 0-10 rank scale,
+  // so the eye reads across a row instead of decoding clustered bars.
+  const PANELS = [
+    { key: 'composite', label: 'wMAPE + |Bias|', color: '#0a0a0a', xaxis: 'x',  domain: [0, 0.30] },
+    { key: 'wmape',     label: 'wMAPE',           color: '#22c55e', xaxis: 'x2', domain: [0.37, 0.63] },
+    { key: 'mase',      label: 'MASE',            color: '#bbf7d0', line: '#15803d', xaxis: 'x3', domain: [0.70, 1.0] },
+  ];
+
+  const overviewTraces = PANELS.map(p => ({
     type: 'bar', orientation: 'h',
-    y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].composite),
-    text: CROSS_MODELS.map(m => CROSS[m].composite.toFixed(2)),
+    x: CROSS_MODELS.map(m => CROSS[m][p.key]),
+    y: CROSS_MODELS,
+    xaxis: p.xaxis,
+    yaxis: 'y',
+    text: CROSS_MODELS.map(m => CROSS[m][p.key].toFixed(2)),
     textposition: 'outside',
-    textfont: { color: '#0a0a0a', size: 12 },
-    marker: { color: '#22c55e' },
-    hovertemplate: '<b>%{y}</b><br>Mean rank: %{x:.2f}<extra></extra>'
-  }], {
+    textfont: { size: 10, color: '#0a0a0a' },
+    marker: p.line ? { color: p.color, line: { color: p.line, width: 0.5 } } : { color: p.color },
+    showlegend: false,
+    hovertemplate: '<b>%{y}</b><br>' + p.label + ': %{x:.2f}<extra></extra>'
+  }));
+
+  const overviewLayout = {
     title: { text: '<b>Cross-Customer Mean Rank</b>', font: { size: 16, color: '#0a0a0a' }, x: 0.02, xanchor: 'left' },
-    xaxis: {
-      title: { text: 'Mean rank across 3 CPG/retail customers (lower is better)', font: { size: 12, color: '#6b7280' } },
-      showgrid: true, gridcolor: 'rgba(10,10,10,0.06)', zeroline: false,
-      tickfont: { size: 11, color: '#6b7280' }
-    },
-    yaxis: { showgrid: false, tickfont: { size: 12, color: '#0a0a0a' } },
+    annotations: PANELS.map(p => ({
+      text: p.label, showarrow: false, xref: 'paper', yref: 'paper',
+      x: (p.domain[0] + p.domain[1]) / 2, y: 1.06,
+      font: { size: 12, color: '#6b7280' }
+    })),
+    yaxis: { showgrid: false, tickfont: { size: 12, color: '#0a0a0a' }, anchor: 'x' },
     plot_bgcolor: 'white', paper_bgcolor: 'white',
     font: FONT,
-    margin: { t: 60, l: 185, r: 60, b: 50 },
+    margin: { t: 70, l: 185, r: 20, b: 40 },
     height: 420
-  }, { responsive: true });
+  };
+  PANELS.forEach(p => {
+    overviewLayout[p.xaxis === 'x' ? 'xaxis' : p.xaxis.replace('x', 'xaxis')] = {
+      domain: p.domain, range: [0, 10.5], anchor: 'y',
+      showgrid: true, gridcolor: 'rgba(10,10,10,0.06)', zeroline: false,
+      tickfont: { size: 10, color: '#6b7280' }
+    };
+  });
+
+  Plotly.newPlot('chart-overview', overviewTraces, overviewLayout, { responsive: true });
 </script>
 </body>
 </html>
