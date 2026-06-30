@@ -196,48 +196,38 @@
     'TIMESFM25_SL1','LGBM_BASE_RECURSIVE','SES_OPT','TIMESFM25_SL2'
   ];
   const CROSS = {
-    'TIMESFM25_SL2':       { composite: 4.00, wmape: 3.00, mase: 1.67 },
-    'SES_OPT':             { composite: 4.00, wmape: 6.00, mase: 6.00 },
-    'LGBM_BASE_RECURSIVE': { composite: 4.00, wmape: 6.33, mase: 6.00 },
-    'TIMESFM25_SL1':       { composite: 4.67, wmape: 3.67, mase: 3.33 },
-    'SEASONAL_NAIVE':      { composite: 5.00, wmape: 6.33, mase: 9.00 },
-    'CHRONOS2_SL2':        { composite: 5.33, wmape: 4.00, mase: 2.33 },
-    'MOIRAI2_SMALL':       { composite: 6.00, wmape: 2.33, mase: 3.33 },
-    'LGBM_BASE_DIRECT':    { composite: 6.00, wmape: 6.00, mase: 5.33 },
-    'MOIRAI_MOE_BASE':     { composite: 6.33, wmape: 8.00, mase: 9.67 },
-    'MOIRAI_MOE_SMALL':    { composite: 9.67, wmape: 9.33, mase: 8.33 },
+    'TIMESFM25_SL2':       { composite: 4.00 },
+    'SES_OPT':             { composite: 4.00 },
+    'LGBM_BASE_RECURSIVE': { composite: 4.00 },
+    'TIMESFM25_SL1':       { composite: 4.67 },
+    'SEASONAL_NAIVE':      { composite: 5.00 },
+    'CHRONOS2_SL2':        { composite: 5.33 },
+    'MOIRAI2_SMALL':       { composite: 6.00 },
+    'LGBM_BASE_DIRECT':    { composite: 6.00 },
+    'MOIRAI_MOE_BASE':     { composite: 6.33 },
+    'MOIRAI_MOE_SMALL':    { composite: 9.67 },
   };
 
-  Plotly.newPlot('chart-overview', [
-    {
-      type: 'bar', orientation: 'h', name: 'wMAPE + |Bias|',
-      y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].composite),
-      marker: { color: '#0a0a0a' }
-    },
-    {
-      type: 'bar', orientation: 'h', name: 'wMAPE',
-      y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].wmape),
-      marker: { color: '#22c55e' }
-    },
-    {
-      type: 'bar', orientation: 'h', name: 'MASE',
-      y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].mase),
-      marker: { color: '#bbf7d0', line: { color: '#15803d', width: 0.5 } }
-    }
-  ], {
+  Plotly.newPlot('chart-overview', [{
+    type: 'bar', orientation: 'h',
+    y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].composite),
+    text: CROSS_MODELS.map(m => CROSS[m].composite.toFixed(2)),
+    textposition: 'outside',
+    textfont: { color: '#0a0a0a', size: 12 },
+    marker: { color: '#22c55e' },
+    hovertemplate: '<b>%{y}</b><br>Mean rank: %{x:.2f}<extra></extra>'
+  }], {
     title: { text: '<b>Cross-Customer Mean Rank</b>', font: { size: 16, color: '#0a0a0a' }, x: 0.02, xanchor: 'left' },
-    barmode: 'group',
     xaxis: {
       title: { text: 'Mean rank across 3 CPG/retail customers (lower is better)', font: { size: 12, color: '#6b7280' } },
       showgrid: true, gridcolor: 'rgba(10,10,10,0.06)', zeroline: false,
       tickfont: { size: 11, color: '#6b7280' }
     },
     yaxis: { showgrid: false, tickfont: { size: 12, color: '#0a0a0a' } },
-    legend: { orientation: 'h', x: 0.02, y: -0.15, font: { size: 12 } },
     plot_bgcolor: 'white', paper_bgcolor: 'white',
     font: FONT,
-    margin: { t: 60, l: 185, r: 40, b: 90 },
-    height: 480
+    margin: { t: 60, l: 185, r: 60, b: 50 },
+    height: 420
   }, { responsive: true });
 </script>
 </body>
