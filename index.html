@@ -40,7 +40,7 @@
 
 <header>
   <h1>Foundation Model Benchmark</h1>
-  <p>Zero-shot foundation models vs. tuned baselines on enterprise supply chain demand &mdash; Daybreak Research</p>
+  <p>Zero-shot foundation models vs. tuned baselines on real CPG and retail demand &mdash; Daybreak Research</p>
 </header>
 
 <nav>
@@ -52,17 +52,17 @@
 
 <div id="panel-overview" class="panel active">
   <div class="callout">
-    <strong>Median rank across 3 customers &mdash; lower is better.</strong>
-    SES_OPT (#2) and LGBM_BASE_RECURSIVE (#3) lead the composite leaderboard.
-    Foundation models show competitive wMAPE but systematic negative bias (under-forecasting) drags their composite rank.
-    TimesFM 2.5 (SL2) is the strongest foundation model on wMAPE alone.
+    <strong>Mean rank across 3 CPG/retail customers &mdash; lower is better.</strong>
+    TIMESFM25_SL2, SES_OPT, and LGBM_BASE_RECURSIVE tie at the top of the composite leaderboard (4.0) &mdash;
+    TimesFM 2.5 (SL2) wins the tiebreak on wMAPE rank, putting a zero-shot foundation model effectively #1.
+    Foundation models broadly show competitive wMAPE but systematic negative bias (under-forecasting) drags their composite rank.
   </div>
   <div class="chart-wrap"><div id="chart-overview"></div></div>
 </div>
 
 <div id="panel-a" class="panel">
   <div class="callout">
-    <strong>Customer A &middot; Monthly &middot; 5-period horizon &middot; 2,796 series.</strong>
+    <strong>Customer A &middot; CPG/Retail &middot; Monthly &middot; 5-period horizon &middot; 2,796 series.</strong>
     The only customer where a foundation model tops the board: MOIRAI_MOE_BASE wins with near-zero bias (0.004).
     Foundation models broadly under-forecast elsewhere on this customer, inflating their composite scores.
     SES_OPT (#2) remains competitive thanks to low bias.
@@ -72,7 +72,7 @@
 
 <div id="panel-b" class="panel">
   <div class="callout">
-    <strong>Customer B &middot; Weekly &middot; 14-period horizon &middot; 9,271 series.</strong>
+    <strong>Customer B &middot; CPG/Retail &middot; Weekly &middot; 14-period horizon &middot; 9,271 series.</strong>
     Tuned models dominate. LGBM_BASE_RECURSIVE wins; all foundation models under-forecast heavily (bias &lt; &minus;0.37).
     MOIRAI_MOE_SMALL and SES_OPT are worst due to compound wMAPE and bias penalties.
   </div>
@@ -81,7 +81,7 @@
 
 <div id="panel-c" class="panel">
   <div class="callout">
-    <strong>Customer C &middot; Monthly &middot; 12-period horizon &middot; 6,281 series.</strong>
+    <strong>Customer C &middot; CPG/Retail &middot; Monthly &middot; 12-period horizon &middot; 6,281 series.</strong>
     Simple baselines dominate by a wide margin: SES_OPT wins with 0.711 composite.
     Foundation models show near-zero bias here &mdash; a markedly different profile from Customers A and B.
     MOIRAI MoE variants are the clear laggards.
@@ -189,23 +189,23 @@
     { model: 'SES_OPT',             composite: 0.7111, mase: 0.9536 },
   ]);
 
-  // Cross-customer — sorted worst→best by composite rank
+  // Cross-customer — sorted worst→best by mean composite rank
   const CROSS_MODELS = [
     'MOIRAI_MOE_SMALL','MOIRAI_MOE_BASE','LGBM_BASE_DIRECT',
-    'CHRONOS2_SL2','MOIRAI2_SMALL','SEASONAL_NAIVE',
-    'TIMESFM25_SL2','TIMESFM25_SL1','LGBM_BASE_RECURSIVE','SES_OPT'
+    'MOIRAI2_SMALL','CHRONOS2_SL2','SEASONAL_NAIVE',
+    'TIMESFM25_SL1','LGBM_BASE_RECURSIVE','SES_OPT','TIMESFM25_SL2'
   ];
   const CROSS = {
-    'SES_OPT':             { composite: 2,  wmape: 8,  mase: 6  },
-    'LGBM_BASE_RECURSIVE': { composite: 3,  wmape: 7,  mase: 7  },
-    'TIMESFM25_SL1':       { composite: 4,  wmape: 4,  mase: 3  },
-    'TIMESFM25_SL2':       { composite: 5,  wmape: 3,  mase: 2  },
-    'SEASONAL_NAIVE':      { composite: 5,  wmape: 7,  mase: 9  },
-    'CHRONOS2_SL2':        { composite: 6,  wmape: 5,  mase: 2  },
-    'MOIRAI2_SMALL':       { composite: 6,  wmape: 2,  mase: 3  },
-    'LGBM_BASE_DIRECT':    { composite: 7,  wmape: 6,  mase: 5  },
-    'MOIRAI_MOE_BASE':     { composite: 8,  wmape: 8,  mase: 10 },
-    'MOIRAI_MOE_SMALL':    { composite: 10, wmape: 9,  mase: 8  },
+    'TIMESFM25_SL2':       { composite: 4.00, wmape: 3.00, mase: 1.67 },
+    'SES_OPT':             { composite: 4.00, wmape: 6.00, mase: 6.00 },
+    'LGBM_BASE_RECURSIVE': { composite: 4.00, wmape: 6.33, mase: 6.00 },
+    'TIMESFM25_SL1':       { composite: 4.67, wmape: 3.67, mase: 3.33 },
+    'SEASONAL_NAIVE':      { composite: 5.00, wmape: 6.33, mase: 9.00 },
+    'CHRONOS2_SL2':        { composite: 5.33, wmape: 4.00, mase: 2.33 },
+    'MOIRAI2_SMALL':       { composite: 6.00, wmape: 2.33, mase: 3.33 },
+    'LGBM_BASE_DIRECT':    { composite: 6.00, wmape: 6.00, mase: 5.33 },
+    'MOIRAI_MOE_BASE':     { composite: 6.33, wmape: 8.00, mase: 9.67 },
+    'MOIRAI_MOE_SMALL':    { composite: 9.67, wmape: 9.33, mase: 8.33 },
   };
 
   Plotly.newPlot('chart-overview', [
@@ -225,10 +225,10 @@
       marker: { color: '#bbf7d0', line: { color: '#15803d', width: 0.5 } }
     }
   ], {
-    title: { text: '<b>Cross-Customer Median Rank</b>', font: { size: 16, color: '#0a0a0a' }, x: 0.02, xanchor: 'left' },
+    title: { text: '<b>Cross-Customer Mean Rank</b>', font: { size: 16, color: '#0a0a0a' }, x: 0.02, xanchor: 'left' },
     barmode: 'group',
     xaxis: {
-      title: { text: 'Median rank across 3 customers (lower is better)', font: { size: 12, color: '#6b7280' } },
+      title: { text: 'Mean rank across 3 CPG/retail customers (lower is better)', font: { size: 12, color: '#6b7280' } },
       showgrid: true, gridcolor: 'rgba(10,10,10,0.06)', zeroline: false,
       tickfont: { size: 11, color: '#6b7280' }
     },
