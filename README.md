@@ -1,6 +1,6 @@
 # Foundation Model Benchmark
 
-Zero-shot time series foundation models benchmarked against tuned statistical and ML baselines on real supply chain demand data.
+Zero-shot time series foundation models benchmarked against tuned statistical and ML baselines on real CPG and retail demand data.
 
 ## Models
 
@@ -35,13 +35,45 @@ Features: lag features, rolling windows, and date encodings derived automaticall
 
 ## Customers
 
-Results cover three anonymized enterprise supply chain clients evaluated on held-out cross-validation windows.
+Results cover three anonymized enterprise CPG/retail clients (SKU-level demand planning) evaluated on held-out cross-validation windows.
 
 | Customer | Series | Eval Horizon | Profile |
 |----------|--------|-------------|---------|
 | Customer A | 2,796 | 9-12 weeks ahead | Weekly |
 | Customer B | 9,271 | 5 steps ahead | Monthly |
 | Customer C | 6,281 | 9-12 periods | Weekly |
+
+## Overall Ranking
+
+Mean rank of each model's per-customer rank across the 3 CPG/retail clients (lower is better). `TIMESFM25_SL2`, `SES_OPT`, and `LGBM_BASE_RECURSIVE` tie at the top (4.00) — `TIMESFM25_SL2` wins the tiebreak on mean wMAPE rank, putting a zero-shot foundation model effectively #1 on the cross-customer composite.
+
+| Model | Mean Composite Rank | Mean wMAPE Rank | Mean MASE Rank | Mean \|Bias\| Rank |
+|---|---|---|---|---|
+| `TIMESFM25_SL2` | 4.00 | 3.00 | 1.67 | 4.33 |
+| `SES_OPT` | 4.00 | 6.00 | 6.00 | 5.67 |
+| `LGBM_BASE_RECURSIVE` | 4.00 | 6.33 | 6.00 | 4.33 |
+| `TIMESFM25_SL1` | 4.67 | 3.67 | 3.33 | 5.33 |
+| `SEASONAL_NAIVE` | 5.00 | 6.33 | 9.00 | 3.00 |
+| `CHRONOS2_SL2` | 5.33 | 4.00 | 2.33 | 5.00 |
+| `MOIRAI2_SMALL` | 6.00 | 2.33 | 3.33 | 6.33 |
+| `LGBM_BASE_DIRECT` | 6.00 | 6.00 | 5.33 | 7.00 |
+| `MOIRAI_MOE_BASE` | 6.33 | 8.00 | 9.67 | 6.00 |
+| `MOIRAI_MOE_SMALL` | 9.67 | 9.33 | 8.33 | 8.00 |
+
+```
+TIMESFM25_SL2        ██████████████  4.00
+SES_OPT              ██████████████  4.00
+LGBM_BASE_RECURSIVE  ██████████████  4.00
+TIMESFM25_SL1        █████████████   4.67
+SEASONAL_NAIVE       ████████████    5.00
+CHRONOS2_SL2         ███████████     5.33
+MOIRAI2_SMALL        ██████████      6.00
+LGBM_BASE_DIRECT     ██████████      6.00
+MOIRAI_MOE_BASE      █████████       6.33
+MOIRAI_MOE_SMALL     ███             9.67
+```
+
+Source: [`data/cross_customer_mean_ranks.csv`](data/cross_customer_mean_ranks.csv).
 
 ## Metrics
 
