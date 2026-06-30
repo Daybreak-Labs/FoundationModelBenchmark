@@ -208,50 +208,37 @@
     'MOIRAI_MOE_SMALL':    { composite: 9.67, wmape: 9.33, mase: 8.33 },
   };
 
-  // Small multiples — one panel per metric, shared model order + shared 0-10 rank scale,
-  // so the eye reads across a row instead of decoding clustered bars.
-  const PANELS = [
-    { key: 'composite', label: 'wMAPE + |Bias|', color: '#0a0a0a', xaxis: 'x',  domain: [0, 0.30] },
-    { key: 'wmape',     label: 'wMAPE',           color: '#22c55e', xaxis: 'x2', domain: [0.37, 0.63] },
-    { key: 'mase',      label: 'MASE',            color: '#bbf7d0', line: '#15803d', xaxis: 'x3', domain: [0.70, 1.0] },
-  ];
-
-  const overviewTraces = PANELS.map(p => ({
-    type: 'bar', orientation: 'h',
-    x: CROSS_MODELS.map(m => CROSS[m][p.key]),
-    y: CROSS_MODELS,
-    xaxis: p.xaxis,
-    yaxis: 'y',
-    text: CROSS_MODELS.map(m => CROSS[m][p.key].toFixed(2)),
-    textposition: 'outside',
-    textfont: { size: 10, color: '#0a0a0a' },
-    marker: p.line ? { color: p.color, line: { color: p.line, width: 0.5 } } : { color: p.color },
-    showlegend: false,
-    hovertemplate: '<b>%{y}</b><br>' + p.label + ': %{x:.2f}<extra></extra>'
-  }));
-
-  const overviewLayout = {
+  Plotly.newPlot('chart-overview', [
+    {
+      type: 'bar', orientation: 'h', name: 'wMAPE + |Bias|',
+      y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].composite),
+      marker: { color: '#0a0a0a' }
+    },
+    {
+      type: 'bar', orientation: 'h', name: 'wMAPE',
+      y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].wmape),
+      marker: { color: '#22c55e' }
+    },
+    {
+      type: 'bar', orientation: 'h', name: 'MASE',
+      y: CROSS_MODELS, x: CROSS_MODELS.map(m => CROSS[m].mase),
+      marker: { color: '#bbf7d0', line: { color: '#15803d', width: 0.5 } }
+    }
+  ], {
     title: { text: '<b>Cross-Customer Mean Rank</b>', font: { size: 16, color: '#0a0a0a' }, x: 0.02, xanchor: 'left' },
-    annotations: PANELS.map(p => ({
-      text: p.label, showarrow: false, xref: 'paper', yref: 'paper',
-      x: (p.domain[0] + p.domain[1]) / 2, y: 1.06,
-      font: { size: 12, color: '#6b7280' }
-    })),
-    yaxis: { showgrid: false, tickfont: { size: 12, color: '#0a0a0a' }, anchor: 'x' },
+    barmode: 'group',
+    xaxis: {
+      title: { text: 'Mean rank across 3 CPG/retail customers (lower is better)', font: { size: 12, color: '#6b7280' } },
+      showgrid: true, gridcolor: 'rgba(10,10,10,0.06)', zeroline: false,
+      tickfont: { size: 11, color: '#6b7280' }
+    },
+    yaxis: { showgrid: false, tickfont: { size: 12, color: '#0a0a0a' } },
+    legend: { orientation: 'h', x: 0.02, y: -0.15, font: { size: 12 } },
     plot_bgcolor: 'white', paper_bgcolor: 'white',
     font: FONT,
-    margin: { t: 70, l: 185, r: 20, b: 40 },
-    height: 420
-  };
-  PANELS.forEach(p => {
-    overviewLayout[p.xaxis === 'x' ? 'xaxis' : p.xaxis.replace('x', 'xaxis')] = {
-      domain: p.domain, range: [0, 10.5], anchor: 'y',
-      showgrid: true, gridcolor: 'rgba(10,10,10,0.06)', zeroline: false,
-      tickfont: { size: 10, color: '#6b7280' }
-    };
-  });
-
-  Plotly.newPlot('chart-overview', overviewTraces, overviewLayout, { responsive: true });
+    margin: { t: 60, l: 185, r: 40, b: 90 },
+    height: 480
+  }, { responsive: true });
 </script>
 </body>
 </html>
