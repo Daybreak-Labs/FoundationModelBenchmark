@@ -60,18 +60,7 @@ Mean rank of each model's per-customer rank across the 3 CPG/retail clients (low
 | `MOIRAI_MOE_BASE` | 6.33 | 8.00 | 9.67 | 6.00 |
 | `MOIRAI_MOE_SMALL` | 9.67 | 9.33 | 8.33 | 8.00 |
 
-```
-TIMESFM25_SL2        ██████████████  4.00
-SES_OPT              ██████████████  4.00
-LGBM_BASE_RECURSIVE  ██████████████  4.00
-TIMESFM25_SL1        █████████████   4.67
-SEASONAL_NAIVE       ████████████    5.00
-CHRONOS2_SL2         ███████████     5.33
-MOIRAI2_SMALL        ██████████      6.00
-LGBM_BASE_DIRECT     ██████████      6.00
-MOIRAI_MOE_BASE      █████████       6.33
-MOIRAI_MOE_SMALL     ███             9.67
-```
+![Cross-Customer Mean Rank](data/cross_customer_mean_rank_chart.png)
 
 Source: [`data/cross_customer_mean_ranks.csv`](data/cross_customer_mean_ranks.csv).
 
