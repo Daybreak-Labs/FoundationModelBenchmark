@@ -1,6 +1,11 @@
 # Foundation Model Benchmark
 
-Zero-shot time series foundation models benchmarked against basic statistical and ML baselines on real CPG and retail demand data.
+Zero-shot time series foundation models benchmarked against basic statistical and ML baselines on three large CPG real-world datasets. 
+
+## Findings
+
+Foundation models should mixed results when compared against SES and basic tabular recursive models, but TimesFM2.5 shows promise with a tie in WMAPE + |BIAS| and strong MASE ranking. 
+In general, other foundation models seem to struggle with intermittency and lumpy demand found in demand datasets. All FMs show a strong negative bias that could disqualify them from production use-case in our industry. 
 
 ## Models
 
