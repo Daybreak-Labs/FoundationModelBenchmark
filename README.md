@@ -2,15 +2,15 @@
 
 Ten zero-shot time series foundation models, scored on seven real CPG and retail demand boards, against everything else we run on those boards.
 
-> **Refresh in progress (2026-11-04).** Four runs are still landing: Moirai 2 small on Customer E and TTM r2 on Customers B, E and F. Rows and averages marked with a board count below `7/7` will move when they do. Rerun `scripts/pull_boards.py` and `scripts/make_chart.py` to refresh.
+Last refreshed 2026-11-04. Rerun `scripts/pull_boards.py` and `scripts/make_chart.py` to refresh.
 
 ## Findings
 
-**Moirai 2 small is the only foundation model that clearly earns its place.** On average it beats 63% of each client's full leaderboard, it is the best FM on five of the six boards it has finished, and it has the smallest bias of any FM. On Customer G it lands #3 of 48, a hair behind the best tuned model.
+**Moirai 2 small is the only foundation model that clearly earns its place.** On average it beats 59% of each client's full leaderboard, it is the best FM on five of the seven boards, and it has the smallest \|bias\| of any FM. On Customer G it lands #3 of 48, a hair behind the best tuned model. Its weak spot is Customer E (#74 of 115).
 
-**Most foundation models do not beat a seasonal naive.** TimesFM 2.5, Chronos-2, Chronos-2 XL, Toto 2 and TiRex 2 all average below the seasonal naive baseline across customers. On Customer F the seasonal naive is #2 of 76; no FM gets near it.
+**Most foundation models do not beat a seasonal naive.** TimesFM 2.5, Chronos-2, Chronos-2 XL, Toto 2 and TiRex 2 all average below the seasonal naive baseline across customers, and the Moirai-MoE models and TTM r2 only edge past it. On Customer F the seasonal naive is #2 of 77; no FM gets near it.
 
-**The bias problem from the first round is still there.** TimesFM 2.5, Chronos-2 and TiRex 2 under-forecast on every single board (mean net bias -22% to -33%). The Moirai-MoE models go the other way and over-forecast on most boards. Every board ranks on accuracy plus absolute bias, so this is what sinks most FMs, not raw error.
+**The bias problem from the first round is still there.** TimesFM 2.5, Chronos-2, TiRex 2 and TTM r2 under-forecast on every single board (mean net bias -15% to -33%). The Moirai-MoE models go the other way and over-forecast on most boards. Every board ranks on accuracy plus absolute bias, so this is what sinks most FMs, not raw error.
 
 ![Share of each client board a zero-shot FM beats](data/cross_customer_chart.png)
 
@@ -22,17 +22,17 @@ Board percentile is a model's rank on a client's official leaderboard divided by
 
 | Model | Boards | Mean board percentile | Mean rank in this roster | Mean \|bias\| | Mean net bias | Boards under-forecast | Max fill share |
 |---|---|---|---|---|---|---|---|
-| Moirai 2 small | 6/7 | 0.37 | 2.2 | 22.5% | -2.2% | 5 | 6.0% |
-| TTM r2 | 4/7 | 0.59 | 4.0 | 14.5% | -13.2% | 4 | 2.7% |
-| Moirai-MoE base | 7/7 | 0.60 | 4.9 | 26.1% | +18.4% | 2 | 9.2% |
-| Moirai-MoE small | 7/7 | 0.63 | 6.0 | 28.5% | +21.7% | 1 | 9.2% |
-| *Seasonal Naive (baseline)* | 7/7 | 0.65 | 5.7 | 15.3% | -2.4% | 5 | 7.5% |
-| TimesFM 2.5 (1y context) | 7/7 | 0.71 | 6.0 | 27.2% | -21.8% | 7 | 9.2% |
-| TimesFM 2.5 (2y context) | 7/7 | 0.75 | 6.1 | 28.6% | -24.9% | 7 | 6.2% |
-| Toto 2 | 7/7 | 0.76 | 5.1 | 30.3% | -10.2% | 6 | 9.2% |
-| Chronos-2 | 7/7 | 0.76 | 6.6 | 28.9% | -24.3% | 7 | 6.1% |
-| Chronos-2 XL | 7/7 | 0.77 | 6.9 | 29.0% | -17.6% | 6 | 9.2% |
-| TiRex 2 | 7/7 | 0.82 | 8.4 | 34.7% | -32.5% | 7 | 9.2% |
+| Moirai 2 small | 7/7 | 0.41 | 2.4 | 20.3% | -2.9% | 6 | 7.5% |
+| Moirai-MoE base | 7/7 | 0.60 | 5.0 | 26.1% | +18.4% | 2 | 9.2% |
+| Moirai-MoE small | 7/7 | 0.63 | 6.1 | 28.5% | +21.7% | 1 | 9.2% |
+| TTM r2 | 7/7 | 0.64 | 5.0 | 22.2% | -15.3% | 7 | 7.5% |
+| *Seasonal Naive (baseline)* | 7/7 | 0.65 | 6.1 | 15.3% | -2.4% | 5 | 7.5% |
+| TimesFM 2.5 (1y context) | 7/7 | 0.71 | 6.3 | 27.2% | -21.8% | 7 | 9.2% |
+| TimesFM 2.5 (2y context) | 7/7 | 0.75 | 6.4 | 28.6% | -24.9% | 7 | 6.2% |
+| Toto 2 | 7/7 | 0.76 | 5.6 | 30.3% | -10.2% | 6 | 9.2% |
+| Chronos-2 | 7/7 | 0.76 | 6.9 | 28.9% | -24.3% | 7 | 6.1% |
+| Chronos-2 XL | 7/7 | 0.77 | 7.3 | 29.0% | -17.6% | 6 | 9.2% |
+| TiRex 2 | 7/7 | 0.82 | 8.9 | 34.7% | -32.5% | 7 | 9.2% |
 
 \|bias\| is each board's own bias measure (most average \|bias\| per snapshot, so over- and under-forecast months do not cancel). Net bias is signed: negative means under-forecast.
 
@@ -41,11 +41,11 @@ Board percentile is a model's rank on a client's official leaderboard divided by
 | Customer | Grain | Scored lead | Board size | Best FM (rank) | Seasonal naive rank | Best FM vs board #1 (rank metric) |
 |---|---|---|---|---|---|---|
 | A | Weekly | weeks 9 to 12 | 177 | Moirai 2 small (#95) | #158 | 0.746 vs 0.634 |
-| B | Monthly | month 5 | 120 | TiRex 2 (#44) | #63 | 1.462 vs 1.139 |
+| B | Monthly | month 5 | 121 | TiRex 2 (#44) | #64 | 1.462 vs 1.139 |
 | C | Weekly | weeks 9 to 12 | 201 | Moirai 2 small (#44) | #174 | 0.493 vs 0.393 |
 | D | Weekly | fiscal month +2 | 119 | Moirai 2 small (#27) | #36 | 0.328 vs 0.285 |
-| E | Weekly | week 3 | 113 | Moirai-MoE base (#38) | #110 | 0.475 vs 0.449 |
-| F | Monthly | month 2 | 76 | Moirai 2 small (#24) | #2 | 0.129 vs 0.218 (higher is better) |
+| E | Weekly | week 3 | 115 | Moirai-MoE base (#38) | #112 | 0.475 vs 0.449 |
+| F | Monthly | month 2 | 77 | Moirai 2 small (#24) | #2 | 0.129 vs 0.218 (higher is better) |
 | G | Monthly | month 1 | 48 | Moirai 2 small (#3) | #47 | 0.703 vs 0.681 |
 
 Full per-customer scorecards (every roster model with WMAPE, \|bias\|, net bias, RMSE, fill share and board rank): [`data/scorecards/`](data/scorecards/).
