@@ -1,0 +1,44 @@
+{
+  "Customer A": {
+    "schema": "<scoring schema>",
+    "freq": "Weekly",
+    "lead": "weeks 9-12",
+    "metric": "WMAPE + mean |bias|"
+  },
+  "Customer B": {
+    "schema": "<scoring schema>",
+    "freq": "Monthly",
+    "lead": "month 5",
+    "metric": "cost-weighted WMAPE + mean |bias|"
+  },
+  "Customer C": {
+    "schema": "<scoring schema>",
+    "freq": "Weekly",
+    "lead": "weeks 9-12",
+    "metric": "WMAPE + mean |bias|"
+  },
+  "Customer D": {
+    "schema": "<scoring schema>",
+    "freq": "Weekly",
+    "lead": "fiscal month +2",
+    "metric": "revenue-weighted WMAPE + |bias|"
+  },
+  "Customer E": {
+    "schema": "<scoring schema>",
+    "freq": "Weekly",
+    "lead": "week 3",
+    "metric": "WMAPE + mean |weekly bias|"
+  },
+  "Customer F": {
+    "schema": "<scoring schema>",
+    "freq": "Monthly",
+    "lead": "month 2",
+    "metric": "WMAPA (higher is better)"
+  },
+  "Customer G": {
+    "schema": "<scoring schema>",
+    "freq": "Monthly",
+    "lead": "month 1",
+    "metric": "WMAPE + |bias|"
+  }
+}
