@@ -1,88 +1,91 @@
 # Foundation Model Benchmark
 
-Zero-shot time series foundation models benchmarked against basic statistical and ML baselines on three large CPG real-world datasets. 
+Ten zero-shot time series foundation models, scored on seven real CPG and retail demand boards, against everything else we run on those boards.
+
+> **Refresh in progress (2026-11-04).** Four runs are still landing: Moirai 2 small on Customer E and TTM r2 on Customers B, E and F. Rows and averages marked with a board count below `7/7` will move when they do. Rerun `scripts/pull_boards.py` and `scripts/make_chart.py` to refresh.
 
 ## Findings
 
-Foundation models should mixed results when compared against SES and basic tabular recursive models, but TimesFM2.5 shows promise with a tie in WMAPE + |BIAS| and strong MASE ranking. 
-In general, other foundation models seem to struggle with intermittency and lumpy demand found in demand datasets. All FMs show a strong negative bias that could disqualify them from production use-case in our industry. 
+**Moirai 2 small is the only foundation model that clearly earns its place.** On average it beats 63% of each client's full leaderboard, it is the best FM on five of the six boards it has finished, and it has the smallest bias of any FM. On Customer G it lands #3 of 48, a hair behind the best tuned model.
+
+**Most foundation models do not beat a seasonal naive.** TimesFM 2.5, Chronos-2, Chronos-2 XL, Toto 2 and TiRex 2 all average below the seasonal naive baseline across customers. On Customer F the seasonal naive is #2 of 76; no FM gets near it.
+
+**The bias problem from the first round is still there.** TimesFM 2.5, Chronos-2 and TiRex 2 under-forecast on every single board (mean net bias -22% to -33%). The Moirai-MoE models go the other way and over-forecast on most boards. Every board ranks on accuracy plus absolute bias, so this is what sinks most FMs, not raw error.
+
+![Share of each client board a zero-shot FM beats](data/cross_customer_chart.png)
+
+Source: [`data/cross_customer.csv`](data/cross_customer.csv).
+
+## Cross-customer summary
+
+Board percentile is a model's rank on a client's official leaderboard divided by the number of models on that board (every tuned statistical, ML and deep learning model we run, not just the FMs). Lower is better; the chart shows `1 - percentile`, the share of the board a model beats.
+
+| Model | Boards | Mean board percentile | Mean rank in this roster | Mean \|bias\| | Mean net bias | Boards under-forecast | Max fill share |
+|---|---|---|---|---|---|---|---|
+| Moirai 2 small | 6/7 | 0.37 | 2.2 | 22.5% | -2.2% | 5 | 6.0% |
+| TTM r2 | 4/7 | 0.59 | 4.0 | 14.5% | -13.2% | 4 | 2.7% |
+| Moirai-MoE base | 7/7 | 0.60 | 4.9 | 26.1% | +18.4% | 2 | 9.2% |
+| Moirai-MoE small | 7/7 | 0.63 | 6.0 | 28.5% | +21.7% | 1 | 9.2% |
+| *Seasonal Naive (baseline)* | 7/7 | 0.65 | 5.7 | 15.3% | -2.4% | 5 | 7.5% |
+| TimesFM 2.5 (1y context) | 7/7 | 0.71 | 6.0 | 27.2% | -21.8% | 7 | 9.2% |
+| TimesFM 2.5 (2y context) | 7/7 | 0.75 | 6.1 | 28.6% | -24.9% | 7 | 6.2% |
+| Toto 2 | 7/7 | 0.76 | 5.1 | 30.3% | -10.2% | 6 | 9.2% |
+| Chronos-2 | 7/7 | 0.76 | 6.6 | 28.9% | -24.3% | 7 | 6.1% |
+| Chronos-2 XL | 7/7 | 0.77 | 6.9 | 29.0% | -17.6% | 6 | 9.2% |
+| TiRex 2 | 7/7 | 0.82 | 8.4 | 34.7% | -32.5% | 7 | 9.2% |
+
+\|bias\| is each board's own bias measure (most average \|bias\| per snapshot, so over- and under-forecast months do not cancel). Net bias is signed: negative means under-forecast.
+
+## Per customer
+
+| Customer | Grain | Scored lead | Board size | Best FM (rank) | Seasonal naive rank | Best FM vs board #1 (rank metric) |
+|---|---|---|---|---|---|---|
+| A | Weekly | weeks 9 to 12 | 177 | Moirai 2 small (#95) | #158 | 0.746 vs 0.634 |
+| B | Monthly | month 5 | 120 | TiRex 2 (#44) | #63 | 1.462 vs 1.139 |
+| C | Weekly | weeks 9 to 12 | 201 | Moirai 2 small (#44) | #174 | 0.493 vs 0.393 |
+| D | Weekly | fiscal month +2 | 119 | Moirai 2 small (#27) | #36 | 0.328 vs 0.285 |
+| E | Weekly | week 3 | 113 | Moirai-MoE base (#38) | #110 | 0.475 vs 0.449 |
+| F | Monthly | month 2 | 76 | Moirai 2 small (#24) | #2 | 0.129 vs 0.218 (higher is better) |
+| G | Monthly | month 1 | 48 | Moirai 2 small (#3) | #47 | 0.703 vs 0.681 |
+
+Full per-customer scorecards (every roster model with WMAPE, \|bias\|, net bias, RMSE, fill share and board rank): [`data/scorecards/`](data/scorecards/).
 
 ## Models
 
-### Foundation Models
+All foundation models run zero-shot: pretrained weights, no fine-tuning on client data, the same code on every customer.
 
-| Model | Source | Context Length | Notes |
-|-------|--------|---------------|-------|
-| `TIMESFM25_SL1` | `darts` — `TimesFM2p5Model` | 1× season_length | Short context: 1 year of weekly history, 1 year of monthly history |
-| `TIMESFM25_SL2` | `darts` — `TimesFM2p5Model` | 2× season_length | Long context: ~2 years of weekly or monthly history |
-| `CHRONOS2_SL2` | `darts` — `Chronos2Model` | 2× season_length | Long context variant of Amazon Chronos 2 |
-| `MOIRAI2_SMALL` | `uni2ts` — `Salesforce/moirai-2.0-R-small` | 1000 steps | Moirai 2 small, fixed context window |
-| `MOIRAI_MOE_BASE` | `uni2ts` — `Salesforce/moirai-moe-1.0-R-base` | 200 steps | Moirai Mixture-of-Experts base |
-| `MOIRAI_MOE_SMALL` | `uni2ts` — `Salesforce/moirai-moe-1.0-R-small` | 200 steps | Moirai Mixture-of-Experts small |
+| Model | Weights | Notes |
+|---|---|---|
+| TimesFM 2.5 (2y / 1y context) | Google `timesfm-2.5-200m-pytorch` | context capped at two or one seasonal cycles |
+| Chronos-2 / Chronos-2 XL | Amazon `chronos-2` (XL: larger checkpoint) | |
+| TiRex 2 | NX-AI `TiRex-2` | run on CPU kernels (see below) |
+| Toto 2 | Datadog `Toto-2.0-22m` | median of the quantile output |
+| Moirai 2 small | Salesforce `moirai-2.0-R-small` | mean of the forecast distribution |
+| Moirai-MoE base / small | Salesforce `moirai-moe-1.0-R-base` / `-small` | mean of the forecast distribution |
+| TTM r2 | IBM `granite-timeseries-ttm-r2` | |
+| Seasonal Naive (baseline) | statsforecast `SeasonalNaive` | season 52 weeks / 12 months |
 
-All foundation models are run zero-shot — no fine-tuning on client data.
+## How it is scored
 
-### ML Baselines
+- **Every number comes from the official scoring gate**, the same locked, versioned leaderboard every model at Daybreak is ranked on. Nothing in this repo recomputes a metric; `scripts/pull_boards.py` only reads the gate's leaderboard views.
+- **Each customer ranks by its own business metric**, agreed with that customer's team: weighted accuracy plus absolute bias at the lead time that matters to them. Customer F ranks by WMAPA (higher is better).
+- **The gate rejects incomplete runs.** A model that skips a scored series is either rerun or, when the skipped rows carry at most 5% of the scored volume, filled from history (zero for series with no recent sales, otherwise a recent mean or last sale). The **fill share** column shows how much of each score is filled. Most fills are new or dormant items no model can forecast from history.
+- **Board size** counts every model admitted to that board, including our tuned production candidates, so percentiles are comparable across customers of very different leaderboard sizes.
 
-| Model | Source | Objective | Strategy | Estimators | Leaves |
-|-------|--------|-----------|----------|-----------|--------|
-| `LGBM_BASE_RECURSIVE` | `mlforecast` (Nixtla) | Tweedie (power=1.5) | Recursive | 100 | 90 |
-| `LGBM_BASE_DIRECT` | `mlforecast` (Nixtla) | Tweedie (power=1.5) | Direct | 100 | 90 |
+## What changed since the July 2026 round
 
-Features: lag features, rolling windows, and date encodings derived automatically from data frequency (weekly: lags 1–26, windows [4,13,26,52]; monthly: lags 1–12, windows [3,6,9,12]).
+- **Seven customers instead of three**, all scored by the locked gate instead of ad hoc queries.
+- **Each customer's own ranking metric.** July ranked everyone on one generic wMAPE + \|bias\| composite. Each board now ranks by the metric agreed with that customer (see below), so July ranks and these ranks are not directly comparable.
+- **New models:** Chronos-2 XL, TiRex 2, Toto 2 and TTM r2. Moirai models now report the mean of their forecast distribution.
+- **Dropped:** MASE (not part of any customer's ranking) and the two plain LightGBM baselines (each board's #1 tuned model is the stronger reference now).
+- **Fixes found along the way:** Toto 2 returned NaN for whole panels when any series had gaps, and ran out of memory on large customers; TiRex 2 GPU kernels no longer compile on current Triton, so it runs on CPU; TTM ran one series per forward pass on CPU and now runs batched on GPU (checked against the reference implementation to 1e-4). These decide whether a model finishes, not what it forecasts.
+- **Customer labels:** A, B and C are the same customers as in July. D through G are new.
 
-### Statistical Baselines
+## Reproduce
 
-| Model | Source | Parameters |
-|-------|--------|-----------|
-| `SES_OPT` | `statsforecast` (Nixtla) — `SimpleExponentialSmoothingOptimized` | α optimized via SSE |
-| `SEASONAL_NAIVE` | `statsforecast` (Nixtla) — `SeasonalNaive` | season_length per client |
-
-## Customers
-
-Results cover three anonymized enterprise CPG/retail clients (SKU-level demand planning) evaluated on held-out cross-validation windows.
-
-| Customer | Series | Eval Horizon | Profile |
-|----------|--------|-------------|---------|
-| Customer A | 2,796 | 9-12 weeks ahead | Weekly |
-| Customer B | 9,271 | 5 steps ahead | Monthly |
-| Customer C | 6,281 | 9-12 periods | Weekly |
-
-## Overall Ranking
-
-Mean rank of each model's per-customer rank across the 3 CPG/retail clients (lower is better). `TIMESFM25_SL2`, `SES_OPT`, and `LGBM_BASE_RECURSIVE` tie at the top (4.00) — `TIMESFM25_SL2` wins the tiebreak on mean wMAPE rank, putting a zero-shot foundation model effectively #1 on the cross-customer composite.
-
-| Model | Mean Composite Rank | Mean wMAPE Rank | Mean MASE Rank | Mean \|Bias\| Rank |
-|---|---|---|---|---|
-| `TIMESFM25_SL2` | 4.00 | 3.00 | 1.67 | 4.33 |
-| `SES_OPT` | 4.00 | 6.00 | 6.00 | 5.67 |
-| `LGBM_BASE_RECURSIVE` | 4.00 | 6.33 | 6.00 | 4.33 |
-| `TIMESFM25_SL1` | 4.67 | 3.67 | 3.33 | 5.33 |
-| `SEASONAL_NAIVE` | 5.00 | 6.33 | 9.00 | 3.00 |
-| `CHRONOS2_SL2` | 5.33 | 4.00 | 2.33 | 5.00 |
-| `MOIRAI2_SMALL` | 6.00 | 2.33 | 3.33 | 6.33 |
-| `LGBM_BASE_DIRECT` | 6.00 | 6.00 | 5.33 | 7.00 |
-| `MOIRAI_MOE_BASE` | 6.33 | 8.00 | 9.67 | 6.00 |
-| `MOIRAI_MOE_SMALL` | 9.67 | 9.33 | 8.33 | 8.00 |
-
-![Cross-Customer Mean Rank](data/cross_customer_mean_rank_chart.png)
-
-Source: [`data/cross_customer_mean_ranks.csv`](data/cross_customer_mean_ranks.csv).
-
-## Metrics
-
-- **wMAPE** — weighted mean absolute percentage error (primary accuracy metric)
-- **Bias** — signed error; negative = systematic under-forecast
-- **wMAPE + |Bias|** — composite rank metric penalizing both error and systematic bias
-- **MASE** — mean absolute scaled error (scale-independent cross-client comparison, using Insample Naive Forecast)
-
-## Source Packages
-
-| Package | Used For | Reference |
-|---------|----------|-----------|
-| [`darts`](https://github.com/unit8co/darts) | TimesFM 2.5, Chronos 2 model wrappers | Unit8 |
-| [`sktime`](https://github.com/sktime/sktime) | Foundation model Panel scitype interface | sktime community |
-| [`uni2ts`](https://github.com/SalesforceAIResearch/uni2ts) | Moirai / Moirai-MoE inference | Salesforce AI Research |
-| [`statsforecast`](https://github.com/Nixtla/statsforecast) | SES_OPT, Seasonal Naive | Nixtla |
-| [`mlforecast`](https://github.com/Nixtla/mlforecast) | LGBM recursive and direct models | Nixtla |
-| [`lightgbm`](https://github.com/microsoft/LightGBM) | Gradient boosting backend | Microsoft |
+```bash
+# needs the databricks CLI logged in to the workspace and read access to the scoring catalog
+cp .clients.local.json.example .clients.local.json   # map Customer labels to scoring schemas (kept out of git)
+python3 scripts/pull_boards.py    # data/scorecards/*.csv, data/cross_customer.csv
+python3 scripts/make_chart.py     # data/cross_customer_chart.png
+```
