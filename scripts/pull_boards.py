@@ -18,8 +18,7 @@ WAREHOUSE = os.environ.get("FMB_WAREHOUSE_ID", "4c38d6a537acd61a")
 
 # Display name -> gate model names, first one present on a board wins (some boards carry a _V2 re-key of the same model).
 ROSTER = {
-    "TimesFM 2.5 (2y ctx)": ["TIMESFM25_SL2", "TIMESFM25_SL2_V2"],
-    "TimesFM 2.5 (1y ctx)": ["TIMESFM25_SL1"],
+    "TimesFM 2.5": ["TIMESFM25_SL2", "TIMESFM25_SL2_V2"],
     "Chronos-2": ["CHRONOS2_SL2", "CHRONOS2_SL2_V2"],
     "Chronos-2 XL": ["CHRONOS2_XL"],
     "TiRex 2": ["TIREX2"],
